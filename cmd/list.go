@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Ashish Thakur <ashish.thakur1110@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List the PRs in a project",
-	Long:  `List all the Pull Request in the project`,
+	Long: `List all the Pull Requests in the project. Result will be 
+	displayed in ascii table form which includes PR number, title and status`,
 	Run: func(cmd *cobra.Command, args []string) {
 		DoList()
 	},
