@@ -3,9 +3,10 @@ module github.com/ashish-thakur111/handle-my-pr
 go 1.16
 
 require (
+	github.com/docker/docker-credential-helpers v0.6.4
 	github.com/google/go-github/v37 v37.0.0
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
