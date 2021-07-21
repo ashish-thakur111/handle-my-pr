@@ -21,7 +21,7 @@ import (
 
 // credsCmd represents the creds command
 var credsCmd = &cobra.Command{
-	Use:   "creds [subcommand] [flags]",
+	Use:   "creds",
 	Short: "Command for adding and list current credentials stored in native store",
 	Long: `Command for adding and list current credentials stored in native store.
 	Secure way of storing credentials rather then storing it in plain files`,
