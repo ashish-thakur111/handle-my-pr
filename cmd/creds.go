@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -27,9 +25,7 @@ var credsCmd = &cobra.Command{
 	Short: "Command for adding and list current credentials stored in native store",
 	Long: `Command for adding and list current credentials stored in native store.
 	Secure way of storing credentials rather then storing it in plain files`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("creds called")
-	},
+	//Run: func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {

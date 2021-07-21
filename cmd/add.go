@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/docker/docker-credential-helpers/credentials"
-	"github.com/docker/docker-credential-helpers/secretservice"
+	"github.com/docker/docker-credential-helpers/pass"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +41,7 @@ type cred struct {
 
 var opts cred
 
-var nativeStore = secretservice.Secretservice{}
+var passStore = pass.Pass{}
 
 func DoAdd() {
 	c := &credentials.Credentials{
@@ -50,7 +50,11 @@ func DoAdd() {
 		Secret:    opts.secret,
 	}
 	fmt.Println("Adding credentials to native store")
-	nativeStore.Add(c)
+	err := passStore.Add(c)
+	if err != nil {
+		fmt.Println("Adding credentials to pass credential manager failed")
+		panic(err)
+	}
 	fmt.Println("Adding credentials finished")
 }
 

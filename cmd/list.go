@@ -41,13 +41,20 @@ var listCmd = &cobra.Command{
 func DoList() {
 	owner, _ := rootCmd.PersistentFlags().GetString("owner")
 	repo, _ := rootCmd.PersistentFlags().GetString("repo")
-	secret, _, err := nativeStore.Get("github")
+	if repo == "" {
+		panic("repo flag is required")
+	}
+	username, secret, err := passStore.Get("github")
 	if err != nil {
 		panic(err)
 	}
 	githubClient := pkgGithub.NewGithubClientWithAuth(secret)
 	prOpts := &github.PullRequestListOptions{
 		State: "open",
+	}
+
+	if owner == "" {
+		owner = username
 	}
 
 	prs, _, err := githubClient.PullRequests.List(context.Background(), owner, repo, prOpts)
