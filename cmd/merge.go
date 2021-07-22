@@ -16,36 +16,71 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
+	"fmt"
+
+	pkgGithub "github.com/ashish-thakur111/handle-my-pr/pkg/vendors/github"
+	"github.com/google/go-github/v37/github"
 	"github.com/spf13/cobra"
 )
 
 // mergeCmd represents the merge command
 var mergeCmd = &cobra.Command{
 	Use:   "merge",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "merge the opened pull request",
+	Long:  `merge the opened pull request to the target branch`,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		prID, _ := cmd.Flags().GetInt("pr-id")
+		mergeMethod, _ := cmd.Flags().GetString("merge-method")
+		if mergeMethod == "" || prID == 0 {
+			cmd.Help()
+			return
+		}
+		DoMerge(prID, mergeMethod)
 	},
+}
+
+func DoMerge(prID int, mergeMethod string) {
+	owner, _ := rootCmd.PersistentFlags().GetString("owner")
+	repo, _ := rootCmd.PersistentFlags().GetString("repo")
+	if repo == "" {
+		panic("repo flag is required")
+	}
+	username, secret, err := passStore.Get("github")
+	if err != nil {
+		panic(err)
+	}
+	if owner == "" {
+		owner = username
+	}
+
+	githubClient := pkgGithub.NewGithubClientWithAuth(secret)
+	opts := &github.PullRequestOptions{
+		CommitTitle:        "Merge pull request #" + fmt.Sprint(prID),
+		MergeMethod:        mergeMethod,
+		DontDefaultIfBlank: false,
+	}
+
+	mergeMessage, response, err := githubClient.PullRequests.Merge(context.Background(),
+		owner, repo, prID, "merged", opts)
+
+	if err != nil {
+		panic(err)
+	}
+	if (response.StatusCode != 200) && (response.StatusCode != 201) {
+		fmt.Println(response.Status)
+		panic(response.Status)
+	}
+
+	fmt.Println(*mergeMessage.Merged)
+	fmt.Println(*mergeMessage.SHA)
+	fmt.Println(*mergeMessage.Message)
 }
 
 func init() {
 	rootCmd.AddCommand(mergeCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// mergeCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// mergeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
-	mergeCmd.Flags().StringP("pr-id", "i", "", "unique PR number")
+	mergeCmd.Flags().IntP("pr-id", "i", 0, "unique PR number")
+	mergeCmd.Flags().StringP("merge-method", "m", "squash",
+		"merge method options are merge, squash and rebase. Default is squash")
+	mergeCmd.MarkFlagRequired("pr-id")
 }
