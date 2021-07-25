@@ -21,6 +21,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/ashish-thakur111/handle-my-pr/pkg/osHelper"
 	pkgGithub "github.com/ashish-thakur111/handle-my-pr/pkg/vendors/github"
 	"github.com/google/go-github/v37/github"
 	"github.com/olekukonko/tablewriter"
@@ -44,7 +45,16 @@ func DoList() {
 	if repo == "" {
 		panic("repo flag is required")
 	}
-	username, secret, err := passStore.Get("github")
+
+	var username string
+	var secret string
+	var err error
+
+	if osHelper.GetOperatingSystem() == osHelper.Windows {
+		username, secret, err = winStore.Get("github")
+	} else {
+		username, secret, err = passStore.Get("github")
+	}
 	if err != nil {
 		panic(err)
 	}

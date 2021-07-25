@@ -18,8 +18,10 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ashish-thakur111/handle-my-pr/pkg/osHelper"
 	"github.com/docker/docker-credential-helpers/credentials"
 	"github.com/docker/docker-credential-helpers/pass"
+	"github.com/docker/docker-credential-helpers/wincred"
 	"github.com/spf13/cobra"
 )
 
@@ -43,6 +45,8 @@ var opts cred
 
 var passStore = pass.Pass{}
 
+var winStore = wincred.Wincred{}
+
 func DoAdd() {
 	c := &credentials.Credentials{
 		ServerURL: opts.server,
@@ -50,7 +54,12 @@ func DoAdd() {
 		Secret:    opts.secret,
 	}
 	fmt.Println("Adding credentials to native store")
-	err := passStore.Add(c)
+	var err error
+	if osHelper.GetOperatingSystem() == osHelper.Windows {
+		winStore.Add(c)
+	} else {
+		err = passStore.Add(c)
+	}
 	if err != nil {
 		fmt.Println("Adding credentials to pass credential manager failed")
 		panic(err)
